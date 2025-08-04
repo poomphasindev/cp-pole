@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปฏิทินของหมาอ้วน V5.1 (Fixed) ❤️</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #ff8fab;      
+            --secondary-color: #f3a6b1;    
+            --background-color: #fff0f5;   
+            --content-bg-color: rgba(255, 255, 255, 0.95);
+            --card-bg-color: #ffffff;
+            --text-color: #583c3c;         
+            --text-color-light: #856f6f;
+            --border-color: #ffd1dc;       
+            --today-highlight: #ffc2d1;    
+            --completed-color: #60d394;    
+            --danger-color: #ff6b6b;
+            --timer-color: #4ecdc4;
+            --main-font: 'Mitr', sans-serif;
+            --shadow-color: rgba(255, 143, 171, 0.15);
+            --shadow-color-hover: rgba(255, 143, 171, 0.3);
+        }
+
+        body.dark-mode {
+            --primary-color: #f77fbe;
+            --secondary-color: #ef99b2;
+            --background-color: #2c2a3c;
+            --content-bg-color: rgba(54, 51, 75, 0.85);
+            --card-bg-color: #43405b;
+            --text-color: #f0e8f2;
+            --text-color-light: #b5a8b8;
+            --border-color: #605c7d;
+            --today-highlight: #5a5475;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --shadow-color-hover: rgba(0, 0, 0, 0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: var(--main-font);
+            background: var(--background-color);
+            background-attachment: fixed;
+            color: var(--text-color);
+            padding: 20px;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--content-bg-color);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow-color);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-content {
+            flex-grow: 1;
+        }
+
+        .header-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 45px; height: 45px;
+            font-size: 1.5rem; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        .profile-frame {
+            width: 50px; height: 50px; border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2); cursor: pointer;
+            transition: all 0.3s;
+        }
+        .profile-frame:hover { transform: scale(1.1); }
+        .profile-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-frame-placeholder {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; font-size: 1.5rem; 
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        
+        .stats-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px; padding: 20px 30px;
+            background: rgba(0,0,0,0.02);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stat-card {
+            background: var(--card-bg-color); padding: 20px;
+            border-radius: 15px; text-align: center;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transition: all 0.3s;
+        }
+        .stat-number { font-size: 2rem; font-weight: 600; color: var(--primary-color); margin-bottom: 5px; }
+        .stat-label { color: var(--text-color-light); font-size: 0.9rem; font-weight: 500; }
+
+        .timer-bar {
+            padding: 20px 30px;
+            background: var(--card-bg-color);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        .timer-content { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .timer-display-wrapper { text-align: center; }
+        .timer-label { font-size: 0.8rem; color: var(--text-color-light); }
+        #timerDisplay { font-family: 'Courier New', monospace; font-size: 2.5rem; font-weight: 600; color: var(--primary-color); }
+        .timer-controls-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+        .timer-presets { display: flex; gap: 10px; flex-wrap: wrap; }
+        .timer-progress-bar { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-top: 15px; }
+        #timerProgressFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--timer-color), var(--primary-color)); border-radius: 4px; transition: width 0.5s linear; }
+
+        .toolbar { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; }
+        .btn-secondary { background-color: var(--card-bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+        
+        .month-navigation { display: flex; align-items: center; gap: 15px; }
+        .month-nav-btn { background: var(--card-bg-color); color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; }
+        .current-month { font-size: 1.3rem; font-weight: 600; min-width: 200px; text-align: center; }
+        
+        .calendar-container { padding: 30px; }
+        .calendar { width: 100%; border-collapse: collapse; }
+        .calendar th { padding: 15px; font-weight: 500; color: var(--text-color-light); border-bottom: 2px solid var(--border-color); }
+        .calendar td { width: 14.28%; height: 120px; border: 1px solid var(--border-color); vertical-align: top; padding: 5px; cursor: pointer; transition: all 0.3s ease; }
+        .other-month { color: var(--text-color-light); opacity: 0.5; }
+        .today { background: var(--today-highlight); }
+        .reading-task { background: var(--secondary-color); color: white; padding: 4px 8px; margin-top: 5px; border-radius: 8px; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .reading-task.completed { background: var(--completed-color); text-decoration: line-through; }
+        
+        .task-list-container { background: rgba(0,0,0,0.02); padding: 30px; }
+        .task-list { background: var(--card-bg-color); border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px var(--shadow-color); }
+        .task-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .task-checkbox { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--secondary-color); cursor: pointer; flex-shrink: 0; }
+        .task-checkbox.completed { background: var(--primary-color); border-color: var(--primary-color); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--card-bg-color); border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .form-input, .form-textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 10px; font-family: inherit; background-color: var(--background-color); color: var(--text-color); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+
+        /* Other minor style adjustments for consistency */
+        .btn:hover { transform: translateY(-2px); }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-timer { background-color: var(--timer-color); color: white; }
+        .btn-pause { background-color: #f39c12; color: white; }
+        #reportModal .modal-content { max-width: 600px; }
+        .chart-bar-fill { background: var(--primary-color); height: 100%; border-radius: 5px; text-align: right; padding-right: 5px; color: white; font-size: 0.8rem; line-height: 20px; }
+        .chart-bar-bg { flex-grow: 1; background: var(--border-color); border-radius: 5px; height: 20px; }
+        .chart-bar { display: flex; align-items: center; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>ปฏิทินของหมาอ้วน</h1>
+                <p>ทำเพื่อบอสสุดที่รัก by ภูมิ 💪✨</p>
+            </div>
+            <div class="header-controls">
+                <div class="profile-frame" id="profileFrame">
+                    <div class="profile-frame-placeholder">💖</div>
+                </div>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">📚 งานทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">✅ ที่ทำเสร็จ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="readingStreak">0</div>
+                <div class="stat-label">🔥 อ่านต่อเนื่อง (วัน)</div>
+            </div>
+             <div class="stat-card">
+                <button class="btn btn-secondary" id="showReportBtn">📊 สรุปรายสัปดาห์</button>
+            </div>
+        </div>
+        
+        <div class="timer-bar">
+            <div class="timer-content">
+                <div class="timer-display-wrapper">
+                    <div class="timer-label">POMODORO TIMER</div>
+                    <div id="timerDisplay">25:00</div>
+                </div>
+                <div class="timer-controls-wrapper">
+                    <div class="timer-presets">
+                        <button class="btn btn-secondary" onclick="startTimer(25)">25 นาที</button>
+                        <button class="btn btn-secondary" onclick="startTimer(45)">45 นาที</button>
+                        <button class="btn btn-secondary" onclick="startTimer(60)">60 นาที</button>
+                    </div>
+                    <div class="timer-controls">
+                        <button id="playPauseBtn" class="btn btn-timer">▶️ เริ่ม</button>
+                        <button id="resetBtn" class="btn btn-danger">🔄 รีเซ็ต</button>
+                    </div>
+                </div>
+            </div>
+            <div class="timer-progress-bar"><div id="timerProgressFill"></div></div>
+        </div>
+
+        <div class="toolbar">
+             <div class="data-actions">
+                <button class="btn btn-secondary" id="importBtn">📥 นำเข้า</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+                <button class="btn btn-secondary" id="exportBtn">📤 นำออก</button>
+            </div>
+            <div class="month-navigation">
+                <button class="month-nav-btn" id="prevMonth">‹</button>
+                <div class="current-month" id="currentMonth"></div>
+                <button class="month-nav-btn" id="nextMonth">›</button>
+            </div>
+             <button class="btn btn-primary" id="addTaskBtn">📚 + เพิ่มตารางอ่าน</button>
+        </div>
+
+        <div class="calendar-container"><table class="calendar"><tbody id="calendarBody"></tbody></table></div>
+
+        <div class="task-list-container">
+            <div class="task-list">
+                <h3>📋 ที่จะอ่านในวันนี้</h3>
+                <div class="daily-progress-container" style="margin: 5px 0 15px 0;">
+                    <div class="timer-progress-bar" style="height: 10px;"><div id="dailyProgressFill" style="background: var(--completed-color);"></div></div>
+                </div>
+                <div id="todayTasks"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle"></h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                <input type="hidden" id="originalTaskDate">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>วิชา / หนังสือ 📖</label>
+                    <input type="text" class="form-input" id="bookTitle" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>บันทึกช่วยจำ / เป้าหมาย 📝</label>
+                    <textarea class="form-textarea" id="taskNotes"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>วันที่ 🗓️</label>
+                    <input type="date" class="form-input" id="taskDate" required>
+                </div>
+                <div class="form-group">
+                    <label>ระดับความสำคัญ ⭐</label>
+                    <select class="form-input" id="taskPriority">
+                        <option value="medium" selected>ปานกลาง</option><option value="high">สำคัญมาก</option><option value="low">ไม่รีบ</option>
+                    </select>
+                </div>
+                <div class="form-actions" style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                    <button type="button" class="btn btn-danger" id="deleteTaskBtn" style="display: none;">🗑️ ลบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal" id="reportModal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title">📊 สรุปผลงาน 7 วัน</h3><button class="close-btn">&times;</button></div><div id="reportContent"></div></div></div>
+    
+    <script>
+    // --- Global Variables & Constants ---
+    const STORAGE_KEY_TASKS = 'readingTasks_BossV5_1';
+    const STORAGE_KEY_THEME = 'theme_BossV5_1';
+    const STORAGE_KEY_TIMER = 'timerState_BossV5_1';
+    const STORAGE_KEY_PROFILE = 'profileImage_BossV5_1';
+    const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const dayNames = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
+    let currentDate = new Date();
+    let readingTasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || {};
+
+    // --- App Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventListeners();
+        applySavedTheme();
+        loadProfileImage();
+        initializeCalendar();
+        restoreTimerState();
+    });
+
+    function setupEventListeners() {
+        document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+        document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
+        document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
+        document.getElementById('taskForm').addEventListener('submit', handleTaskSubmit);
+        document.getElementById('deleteTaskBtn').addEventListener('click', handleDeleteTask);
+        document.querySelectorAll('.modal .close-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('.modal').classList.remove('show')));
+        document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }));
+        document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+        document.getElementById('resetBtn').addEventListener('click', resetTimer);
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+        document.getElementById('importFile').addEventListener('change', handleImport);
+        document.getElementById('exportBtn').addEventListener('click', handleExport);
+        document.getElementById('showReportBtn').addEventListener('click', showWeeklyReport);
+        document.getElementById('profileFrame').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*';
+            input.onchange = handleProfileImage;
+            input.click();
+        });
+    }
+    
+    // --- Major Features ---
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem(STORAGE_KEY_THEME, isDarkMode ? 'dark' : 'light');
+        document.getElementById('themeToggle').textContent = isDarkMode ? '☀️' : '🌙';
+    }
+
+    function applySavedTheme() {
+        if (localStorage.getItem(STORAGE_KEY_THEME) === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').textContent = '☀️';
+        }
+    }
+
+    // FIX: Profile image functionality restored
+    function handleProfileImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            localStorage.setItem(STORAGE_KEY_PROFILE, e.target.result);
+            loadProfileImage();
+        };
+        reader.readAsDataURL(file);
+    }
+    function loadProfileImage() {
+        const savedImage = localStorage.getItem(STORAGE_KEY_PROFILE);
+        const profileFrame = document.getElementById('profileFrame');
+        if (savedImage) {
+            profileFrame.innerHTML = `<img src="${savedImage}" alt="Profile">`;
+        } else {
+            profileFrame.innerHTML = `<div class="profile-frame-placeholder">💖</div>`;
+        }
+    }
+    
+    // --- Pomodoro Timer (Logic Refined) ---
+    let timerInterval = null;
+    let timerEndTime = 0;
+    let pausedRemainingTime = 0; // in ms
+    let isTimerPaused = true;
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressFill = document.getElementById('timerProgressFill');
+
+    function startTimer(minutes) {
+        clearInterval(timerInterval);
+        isTimerPaused = false;
+        const durationMs = minutes * 60 * 1000;
+        timerEndTime = Date.now() + durationMs;
+        pausedRemainingTime = durationMs;
+        
+        timerInterval = setInterval(tick, 500);
+        playPauseBtn.textContent = '⏸️ หยุด';
+        playPauseBtn.classList.replace('btn-timer', 'btn-pause');
+        saveTimerState();
+    }
+    
+    function togglePlayPause() {
+        if (!timerEndTime && pausedRemainingTime === 0) return;
+        
+        isTimerPaused = !isTimerPaused;
+        if (isTimerPaused) { // Pausing
+            clearInterval(timerInterval);
+            pausedRemainingTime = timerEndTime - Date.now();
+            playPauseBtn.textContent = '▶️ อ่านต่อ';
+            playPauseBtn.classList.replace('btn-pause', 'btn-timer');
+        } else { // Resuming
+            timerEndTime = Date.now() + pausedRemainingTime;
+            timerInterval = setInterval(tick, 500);
+            playPauseBtn.textContent = '⏸️ หยุด';
+            playPauseBtn.classList.replace('btn-timer', 'btn-pause');
+        }
+        saveTimerState();
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        isTimerPaused = true;
+        timerEndTime = 0;
+        pausedRemainingTime = 0;
+        updateTimerDisplay(25 * 60);
+        progressFill.style.width = '0%';
+        playPauseBtn.textContent = '▶️ เริ่ม';
+        playPauseBtn.classList.replace('btn-pause', 'btn-timer');
+        localStorage.removeItem(STORAGE_KEY_TIMER);
+    }
+    
+    function tick() {
+        const remainingMs = timerEndTime - Date.now();
+        if (remainingMs <= 0) {
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            resetTimer();
+            return;
+        }
+        updateTimerDisplay(remainingMs / 1000);
+        const totalDurationMs = JSON.parse(localStorage.getItem(STORAGE_KEY_TIMER)).duration;
+        const progress = Math.max(0, 100 - (remainingMs / totalDurationMs * 100));
+        progressFill.style.width = `${progress}%`;
+    }
+
+    function updateTimerDisplay(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function saveTimerState() {
+        const totalDuration = isTimerPaused ? pausedRemainingTime : timerEndTime - (Date.now() - pausedRemainingTime);
+        localStorage.setItem(STORAGE_KEY_TIMER, JSON.stringify({
+            endTime: timerEndTime,
+            pausedTime: pausedRemainingTime,
+            isPaused: isTimerPaused,
+            duration: totalDuration > 0 ? totalDuration : pausedRemainingTime,
+        }));
+    }
+
+    function restoreTimerState() {
+        const state = JSON.parse(localStorage.getItem(STORAGE_KEY_TIMER));
+        if (!state) {
+            resetTimer();
+            return;
+        };
+        isTimerPaused = state.isPaused;
+        pausedRemainingTime = state.pausedTime;
+        timerEndTime = state.endTime;
+        
+        if (isTimerPaused) {
+            playPauseBtn.textContent = '▶️ อ่านต่อ';
+            playPauseBtn.classList.replace('btn-pause', 'btn-timer');
+            updateTimerDisplay(pausedRemainingTime / 1000);
+        } else {
+            const remaining = timerEndTime - Date.now();
+            if (remaining > 0) {
+                timerInterval = setInterval(tick, 500);
+                playPauseBtn.textContent = '⏸️ หยุด';
+                playPauseBtn.classList.replace('btn-timer', 'btn-pause');
+            } else { resetTimer(); }
+        }
+    }
+    
+    // --- Calendar & Task Core Logic (Save/Edit Logic Fixed) ---
+    function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); initializeCalendar(); }
+    
+    function initializeCalendar() {
+        // ... (Rendering logic is mostly the same, safe to keep)
+        const year = currentDate.getFullYear(), month = currentDate.getMonth();
+        document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year + 543}`;
+        const firstDay = new Date(year, month, 1), lastDay = new Date(year, month + 1, 0);
+        const calendarBody = document.getElementById('calendarBody');
+        calendarBody.innerHTML = '';
+        let date = 1, dayOfWeek = firstDay.getDay();
+
+        for (let i = 0; i < 6; i++) {
+            if (date > lastDay.getDate()) break;
+            let row = calendarBody.insertRow();
+            for (let j = 0; j < 7; j++) {
+                let cell = row.insertCell();
+                if (i === 0 && j < dayOfWeek || date > lastDay.getDate()) { cell.classList.add('other-month'); } 
+                else {
+                    const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                    cell.innerHTML = `<div class="date-number">${date}</div><div class="tasks-wrapper"></div>`;
+                    if (date === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) { cell.classList.add('today'); }
+                    if (readingTasks[dateKey]) {
+                        const wrapper = cell.querySelector('.tasks-wrapper');
+                        readingTasks[dateKey].forEach(task => {
+                            const taskEl = document.createElement('div');
+                            taskEl.className = `reading-task ${task.completed ? 'completed' : ''}`;
+                            taskEl.textContent = task.bookTitle;
+                            taskEl.addEventListener('click', (e) => { e.stopPropagation(); openTaskModal(dateKey, task.id); });
+                            wrapper.appendChild(taskEl);
+                        });
+                    }
+                    cell.addEventListener('click', () => openTaskModal(dateKey));
+                    date++;
+                }
+            }
+        }
+        updateAllUI();
+    }
+    
+    function openTaskModal(dateKey = null, taskId = null) {
+        const modal = document.getElementById('taskModal'), form = document.getElementById('taskForm');
+        form.reset();
+        const today = new Date().toISOString().split('T')[0];
+        const targetDate = dateKey || today;
+        document.getElementById('taskDate').value = targetDate;
+        document.getElementById('deleteTaskBtn').style.display = 'none';
+        
+        if (taskId) {
+            const task = readingTasks[targetDate]?.find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('modalTitle').textContent = 'แก้ไขตารางอ่าน';
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('originalTaskDate').value = targetDate; // FIX: Set original date
+                document.getElementById('bookTitle').value = task.bookTitle;
+                document.getElementById('taskNotes').value = task.notes || '';
+                document.getElementById('taskPriority').value = task.priority;
+                document.getElementById('deleteTaskBtn').style.display = 'block';
+            }
+        } else {
+            document.getElementById('modalTitle').textContent = 'เพิ่มตารางอ่าน';
+            document.getElementById('originalTaskDate').value = ''; // Clear for new tasks
+        }
+        modal.classList.add('show');
+    }
+
+    // FIX: Overhauled handleTaskSubmit to fix the save bug
+    function handleTaskSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('taskId').value;
+        const newDate = document.getElementById('taskDate').value;
+        const originalDate = document.getElementById('originalTaskDate').value;
+        
+        const taskData = {
+            id: id ? Number(id) : Date.now(),
+            bookTitle: document.getElementById('bookTitle').value.trim(),
+            notes: document.getElementById('taskNotes').value.trim(),
+            priority: document.getElementById('taskPriority').value,
+            completed: false, // Default for new, will be preserved for edits
+        };
+
+        if (id) { // This is an existing task
+            const oldTask = readingTasks[originalDate]?.find(t => t.id === taskData.id);
+            if (oldTask) taskData.completed = oldTask.completed; // Preserve completion status
+
+            // Remove from original date
+            readingTasks[originalDate] = readingTasks[originalDate].filter(t => t.id !== taskData.id);
+            if (readingTasks[originalDate].length === 0) delete readingTasks[originalDate];
+        }
+        
+        // Add to new date
+        if (!readingTasks[newDate]) readingTasks[newDate] = [];
+        readingTasks[newDate].push(taskData);
+        
+        saveAndRerender();
+        document.getElementById('taskModal').classList.remove('show');
+    }
+    
+    function handleDeleteTask() {
+        const id = Number(document.getElementById('taskId').value);
+        const date = document.getElementById('originalTaskDate').value; // Use original date to find it
+        if (confirm('แน่ใจนะว่าจะลบรายการนี้?')) {
+            readingTasks[date] = readingTasks[date].filter(t => t.id !== id);
+            if (readingTasks[date].length === 0) delete readingTasks[date];
+            saveAndRerender();
+            document.getElementById('taskModal').classList.remove('show');
+        }
+    }
+
+    function toggleTaskCompletion(dateKey, taskId) {
+        const task = readingTasks[dateKey]?.find(t => t.id === taskId);
+        if (task) {
+            task.completed = !task.completed;
+            saveAndRerender();
+        }
+    }
+    
+    // --- UI Updates & Renders ---
+    function saveAndRerender() {
+        localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(readingTasks));
+        initializeCalendar();
+    }
+
+    function updateAllUI() { updateStats(); showTodayTasks(); }
+
+    function updateStats() {
+        let total = 0, completed = 0;
+        Object.values(readingTasks).flat().forEach(task => {
+            total++;
+            if (task.completed) completed++;
+        });
+        document.getElementById('totalTasks').textContent = total;
+        document.getElementById('completedTasks').textContent = completed;
+        
+        // FIX: Streak calculation implemented
+        let streak = 0;
+        let checkDate = new Date();
+        while (true) {
+            const dateKey = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+            const tasksToday = readingTasks[dateKey];
+            if (tasksToday && tasksToday.length > 0 && tasksToday.every(t => t.completed)) {
+                streak++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else { break; }
+        }
+        document.getElementById('readingStreak').textContent = streak;
+    }
+
+    function showTodayTasks() {
+        const todayKey = new Date().toISOString().split('T')[0];
+        const tasks = readingTasks[todayKey] || [];
+        const container = document.getElementById('todayTasks');
+        container.innerHTML = '';
+        
+        const completedCount = tasks.filter(t => t.completed).length;
+        document.getElementById('dailyProgressFill').style.width = `${tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0}%`;
+        
+        if (tasks.length > 0 && completedCount === tasks.length) {
+            setTimeout(() => confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } }), 500);
+        }
+        // ... (Rest of showTodayTasks is the same and fine)
+         if (tasks.length === 0) {
+            container.innerHTML = `<p style="text-align:center; padding: 20px 0;">วันนี้พักผ่อนก่อนก็ได้นะเจ้าหมาอ้วน 😊</p>`;
+            return;
+        }
+        tasks.sort((a,b) => {
+            const order = { high: 1, medium: 2, low: 3 };
+            return order[a.priority] - order[b.priority];
+        }).forEach(task => {
+            const item = document.createElement('div');
+            item.className = 'task-item';
+            item.innerHTML = `
+                <div class="task-checkbox ${task.completed ? 'completed' : ''}" onclick="toggleTaskCompletion('${todayKey}', ${task.id})"></div>
+                <div style="flex: 1; opacity: ${task.completed ? 0.7 : 1}">
+                    <div style="font-weight: 500; cursor:pointer;" onclick="openTaskModal('${todayKey}', ${task.id})">${task.bookTitle}</div>
+                    ${task.notes ? `<div style="color: var(--text-color-light); font-size: 0.9rem; white-space: pre-wrap;">${task.notes}</div>` : ''}
+                </div>`;
+            container.appendChild(item);
+        });
+    }
+    
+    // --- Data Management & Reports ---
+    function handleExport() { /* ... unchanged ... */ 
+        const data = JSON.stringify(readingTasks, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `calendar_backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    function handleImport(event) { /* ... unchanged ... */ 
+        const file = event.target.files[0];
+        if (!file) return;
+        if (confirm('แน่ใจนะว่าจะนำเข้าข้อมูล? ข้อมูลปัจจุบันจะถูกเขียนทับทั้งหมด!')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedTasks = JSON.parse(e.target.result);
+                    readingTasks = importedTasks;
+                    saveAndRerender();
+                } catch (err) { alert('ไฟล์ไม่ถูกต้องหรือเสียหาย'); }
+            };
+            reader.readAsText(file);
+        }
+        event.target.value = '';
+    }
+    function showWeeklyReport() { /* ... unchanged ... */ 
+        const reportModal = document.getElementById('reportModal');
+        const reportContent = document.getElementById('reportContent');
+        let reportData = { total: 0, completed: 0, days: {} };
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateKey = d.toISOString().split('T')[0];
+            const dayName = dayNames[d.getDay()];
+            const tasks = readingTasks[dateKey] || [];
+            reportData.total += tasks.length;
+            const dayCompleted = tasks.filter(t => t.completed).length;
+            reportData.completed += dayCompleted;
+            reportData.days[dateKey] = { name: dayName, completed: dayCompleted, total: tasks.length };
+        }
+        const completionRate = reportData.total > 0 ? Math.round((reportData.completed / reportData.total) * 100) : 0;
+        let chartHTML = Object.values(reportData.days).map(day => {
+            const barPercent = day.total > 0 ? (day.completed / day.total) * 100 : 0;
+            return `<div class="chart-bar"><div class="chart-label" style="width: 80px; font-size: 0.9rem;">${day.name}</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${barPercent}%">${day.completed}/${day.total}</div></div></div>`;
+        }).join('');
+        reportContent.innerHTML = `<div class="report-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;"><div class="report-item" style="background: var(--background-color); padding: 15px; border-radius: 10px; text-align: center;"><div class="label">งานทั้งหมด</div><div class="value" style="font-size: 1.8rem; font-weight: 600; color: var(--primary-color);">${reportData.total}</div></div><div class="report-item" style="background: var(--background-color); padding: 15px; border-radius: 10px; text-align: center;"><div class="label">ที่ทำสำเร็จ</div><div class="value" style="font-size: 1.8rem; font-weight: 600; color: var(--primary-color);">${reportData.completed}</div></div></div><div class="chart-container" style="margin-top: 20px;">${chartHTML}</div>`;
+        reportModal.classList.add('show');
+    }
+    </script>
+</body>
+</html>
