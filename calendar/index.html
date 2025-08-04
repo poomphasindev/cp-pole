@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปฏิทินอ่านหนังสือเพื่อเธอ V2.0 💖</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* =====================================================
+        🎨 ส่วนปรับแต่งดีไซน์หลัก (Customization Section) 🎨
+        เปลี่ยนสีและฟอนต์หลักของเว็บได้ง่ายๆ ที่นี่
+        ===================================================== */
+        :root {
+            /* --- 🎨 เปลี่ยนสีตรงนี้ได้เลย --- */
+            --primary-color: #ff8fab;      /* สีชมพูหลัก (ปุ่ม, ไฮไลท์) */
+            --secondary-color: #f3a6b1;    /* สีชมพูรอง */
+            --background-color: #fff0f5;   /* สีพื้นหลัง (ชมพูอ่อนๆ) */
+            --text-color: #583c3c;         /* สีตัวอักษรหลัก (น้ำตาลเข้ม) */
+            --light-text-color: #ffffff;   /* สีตัวอักษรบนพื้นสีเข้ม (ขาว) */
+            --border-color: #ffd1dc;       /* สีเส้นขอบ (ชมพูอ่อน) */
+            --card-bg-color: #ffffff;      /* สีพื้นหลังการ์ด (ขาว) */
+            --today-highlight: #ffc2d1;    /* สีไฮไลท์สำหรับวันปัจจุบัน */
+            --completed-color: #60d394;    /* สีเขียวสำหรับงานที่เสร็จแล้ว */
+            
+            /* --- 🔠 ฟอนต์หลัก --- */
+            --main-font: 'Mitr', sans-serif;
+        }
+        /* ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--main-font);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* === ส่วนหัว === */
+        .header {
+            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .profile-frame {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .profile-frame:hover {
+            transform: scale(1.1);
+        }
+        .profile-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-frame-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* === สถิติ (ฟีเจอร์ใหม่!) === */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+            background: #fff7f9;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stat-card {
+            background: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 143, 171, 0.2);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* === แถบเครื่องมือ === */
+        .toolbar {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 143, 171, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 143, 171, 0.5);
+        }
+        
+        .month-navigation { display: flex; align-items: center; gap: 15px; }
+        .month-nav-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .month-nav-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+        .current-month {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        /* === ปฏิทิน === */
+        .calendar-container { padding: 30px; }
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        .calendar th {
+            background: var(--secondary-color);
+            color: white;
+            padding: 15px;
+            font-weight: 500;
+        }
+        .calendar td {
+            width: 14.28%;
+            height: 120px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+            padding: 5px;
+            position: relative;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        .calendar td:hover {
+            background: #fff7f9;
+        }
+        .date-number {
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 1rem;
+            margin-left: 3px;
+        }
+        .other-month .date-number { color: #ccc; }
+        .today { background: var(--today-highlight); }
+        .today .date-number {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* === งานการอ่าน (ในปฏิทิน) === */
+        .reading-task {
+            background: var(--secondary-color);
+            color: white;
+            padding: 4px 8px;
+            margin-top: 5px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .reading-task:hover {
+            transform: scale(1.05);
+            background: var(--primary-color);
+        }
+        .reading-task.completed {
+            background: var(--completed-color);
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        /* === รายการงานวันนี้ (ฟีเจอร์ใหม่!) === */
+        .task-list-container {
+            background: #fff7f9;
+            padding: 30px;
+        }
+        .task-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .task-item:last-child { border-bottom: none; }
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            border: 2px solid var(--secondary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .task-checkbox.completed {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            position: relative;
+        }
+        .task-checkbox.completed::after {
+            content: "✔";
+            color: white;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8rem;
+        }
+
+        /* === โมดัล (หน้าต่าง Pop-up) === */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; border-radius: 20px;
+            padding: 30px; max-width: 500px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: scale(0.9); transition: all 0.3s ease;
+        }
+        .modal.show .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+        .modal-title { font-size: 1.5rem; font-weight: 500; color: var(--primary-color); }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #aaa; transition: color 0.3s ease; }
+        .close-btn:hover { color: var(--primary-color); }
+
+        /* === ฟอร์มในโมดัล === */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color); }
+        .form-input {
+            width: 100%; padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px; font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(255, 143, 171, 0.2); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="profile-frame" id="profileFrame" title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์">
+                <div class="profile-frame-placeholder">💖</div>
+            </div>
+            <h1>ปฏิทินอ่านหนังของหมาอ้วน</h1>
+            <p>ทุกความตั้งใจมีความหมายเสมอสู้ๆ</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">งานทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">ที่ทำเสร็จ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="readingStreak">0</div>
+                <div class="stat-label">อ่านต่อเนื่อง (วัน)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completionRate">0%</div>
+                <div class="stat-label">ความสำเร็จ</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" id="addTaskBtn">+ เพิ่มตารางอ่าน</button>
+            <div class="month-navigation">
+                <button class="month-nav-btn" id="prevMonth">‹</button>
+                <div class="current-month" id="currentMonth"></div>
+                <button class="month-nav-btn" id="nextMonth">›</button>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <table class="calendar">
+                <thead>
+                    <tr>
+                        <th>อาทิตย์</th><th>จันทร์</th><th>อังคาร</th><th>พุธ</th><th>พฤหัสบดี</th><th>ศุกร์</th><th>เสาร์</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
+        </div>
+
+        <div class="task-list-container">
+            <div class="task-list">
+                <h3 style="margin-bottom: 15px; color: var(--text-color);">📋 ที่จะอ่านในวันนี้</h3>
+                <div id="todayTasks"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">เพิ่มตารางอ่าน</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                <div class="form-group">
+                    <label class="form-label">วิชา / หนังสือที่จะอ่าน 📖</label>
+                    <input type="text" class="form-input" id="bookTitle" placeholder="เช่น สรุปชีวะบทที่ 5" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">เป้าหมาย 🎯</label>
+                    <input type="text" class="form-input" id="readingGoal" placeholder="เช่น อ่านบทที่ 1-3, ทำโจทย์ 20 ข้อ">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">วันที่ 🗓️</label>
+                    <input type="date" class="form-input" id="taskDate" required>
+                </div>
+                 <div class="form-group">
+                    <label class="form-label">เวลา (ถ้ามี) ⏰</label>
+                    <input type="time" class="form-input" id="taskTime">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ระดับความสำคัญ ⭐</label>
+                    <select class="form-input" id="taskPriority">
+                        <option value="low">ไม่รีบ</option>
+                        <option value="medium" selected>ปานกลาง</option>
+                        <option value="high">สำคัญมาก</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">💾 บันทึก</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // === ตัวแปรสำคัญ ===
+        let currentDate = new Date();
+        let selectedDate = null;
+        let readingTasks = JSON.parse(localStorage.getItem('readingTasksV2')) || {};
+
+        const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+
+        // === เริ่มต้นระบบ ===
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalendar();
+            setupEventListeners();
+            loadProfileImage();
+        });
+
+        // === การตั้งค่า Event Listeners ===
+        function setupEventListeners() {
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                initializeCalendar();
+            });
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                initializeCalendar();
+            });
+            document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
+            document.getElementById('closeModal').addEventListener('click', closeTaskModal);
+            document.getElementById('taskForm').addEventListener('submit', handleTaskSubmit);
+            document.getElementById('taskModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('taskModal')) closeTaskModal();
+            });
+            document.getElementById('profileFrame').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file'; input.accept = 'image/*';
+                input.onchange = handleProfileImage;
+                input.click();
+            });
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openTaskModal(); }
+                if (e.key === 'Escape') closeTaskModal();
+            });
+        }
+        
+        // === การจัดการรูปโปรไฟล์ ===
+        function handleProfileImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    localStorage.setItem('profileImageV2', e.target.result);
+                    loadProfileImage();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        function loadProfileImage() {
+            const savedImage = localStorage.getItem('profileImageV2');
+            const profileFrame = document.getElementById('profileFrame');
+            if (savedImage) {
+                profileFrame.innerHTML = `<img src="${savedImage}" alt="Profile">`;
+            }
+        }
+
+        // === สร้างปฏิทิน ===
+        function initializeCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year + 543}`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+            
+            let date = 1;
+            let dayOfWeek = firstDay.getDay();
+
+            for (let i = 0; i < 6; i++) {
+                if (date > lastDay.getDate()) break;
+                const row = document.createElement('tr');
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    if (i === 0 && j < dayOfWeek) {
+                        cell.classList.add('other-month');
+                    } else if (date > lastDay.getDate()) {
+                        cell.classList.add('other-month');
+                    } else {
+                        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                        cell.innerHTML = `<div class="date-number">${date}</div>`;
+                        
+                        const today = new Date();
+                        if (date === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                            cell.classList.add('today');
+                        }
+
+                        // แสดง Task ในปฏิทิน
+                        if (readingTasks[dateKey]) {
+                            readingTasks[dateKey].forEach(task => {
+                                const taskEl = document.createElement('div');
+                                taskEl.className = `reading-task ${task.completed ? 'completed' : ''}`;
+                                taskEl.textContent = `📖 ${task.bookTitle}`;
+                                taskEl.title = task.bookTitle;
+                                taskEl.addEventListener('click', (e) => {
+                                    e.stopPropagation(); // ป้องกันไม่ให้ modal เปิด
+                                    toggleTaskCompletion(dateKey, task.id);
+                                });
+                                cell.appendChild(taskEl);
+                            });
+                        }
+                        
+                        cell.addEventListener('click', () => openTaskModal(dateKey));
+                        date++;
+                    }
+                    row.appendChild(cell);
+                }
+                calendarBody.appendChild(row);
+            }
+            updateAllUI();
+        }
+
+        // === การจัดการโมดัลและฟอร์ม ===
+        function openTaskModal(dateKey = null) {
+            document.getElementById('taskForm').reset();
+            const modal = document.getElementById('taskModal');
+            if (dateKey) {
+                document.getElementById('taskDate').value = dateKey;
+            } else {
+                 document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+            }
+            modal.classList.add('show');
+        }
+        function closeTaskModal() { document.getElementById('taskModal').classList.remove('show'); }
+        function handleTaskSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                id: Date.now(),
+                bookTitle: document.getElementById('bookTitle').value,
+                readingGoal: document.getElementById('readingGoal').value,
+                date: document.getElementById('taskDate').value,
+                time: document.getElementById('taskTime').value,
+                priority: document.getElementById('taskPriority').value,
+                completed: false,
+            };
+            if (!readingTasks[formData.date]) readingTasks[formData.date] = [];
+            readingTasks[formData.date].push(formData);
+            saveData();
+            closeTaskModal();
+            initializeCalendar();
+            showNotification(`✨ เพิ่ม '${formData.bookTitle}' ให้แล้วสู้ๆอิหมาอ้วน`, 'success');
+        }
+
+        // === การจัดการ Task ===
+        function toggleTaskCompletion(dateKey, taskId) {
+            const task = readingTasks[dateKey].find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveData();
+                initializeCalendar();
+                const message = task.completed ? `🎉 เก่งมากจร้! ทำ '${task.bookTitle}' สำเร็จแล้ว` : `📖 กลับมาอ่าน '${task.bookTitle}' ต่อ`;
+                showNotification(message, task.completed ? 'success' : 'info');
+            }
+        }
+        
+        // === อัปเดต UI ทั้งหมด ===
+        function updateAllUI(){
+            updateStats();
+            showTodayTasks();
+        }
+        
+        // === อัปเดตสถิติ ===
+        function updateStats() {
+            let total = 0, completed = 0;
+            const allDates = Object.keys(readingTasks).sort();
+            
+            allDates.forEach(date => {
+                const dayTasks = readingTasks[date];
+                total += dayTasks.length;
+                completed += dayTasks.filter(t => t.completed).length;
+            });
+            
+            let streak = 0;
+            let checkDate = new Date();
+            while(true){
+                const dateKey = checkDate.toISOString().split('T')[0];
+                if(readingTasks[dateKey] && readingTasks[dateKey].some(t => t.completed)){
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            
+            const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('readingStreak').textContent = streak;
+            document.getElementById('completionRate').textContent = `${rate}%`;
+        }
+
+        // === แสดงงานวันนี้ ===
+        function showTodayTasks() {
+            const todayKey = new Date().toISOString().split('T')[0];
+            const todayTasks = readingTasks[todayKey] || [];
+            const container = document.getElementById('todayTasks');
+            container.innerHTML = '';
+
+            if (todayTasks.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#aaa; padding: 20px 0;">วันนี้ยังไม่มีตารางอ่านหนังสือเลยนะ 😊</p>`;
+                return;
+            }
+            todayTasks.forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.innerHTML = `
+                    <div class="task-checkbox ${task.completed ? 'completed' : ''}" onclick="toggleTaskCompletion('${todayKey}', ${task.id})"></div>
+                    <div style="flex: 1; ${task.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+                        <div style="font-weight: 500;">📖 ${task.bookTitle}</div>
+                        ${task.readingGoal ? `<div style="color: #888; font-size: 0.9rem;">🎯 ${task.readingGoal}</div>` : ''}
+                        ${task.time ? `<div style="color: #888; font-size: 0.9rem;">⏰ ${task.time}</div>` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // === ฟังก์ชันช่วยเหลือ ===
+        function saveData() {
+            localStorage.setItem('readingTasksV2', JSON.stringify(readingTasks));
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: -320px;
+                background-color: ${type === 'success' ? 'var(--completed-color)' : 'var(--primary-color)'};
+                color: white; padding: 15px 20px; border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); z-index: 10000;
+                font-family: var(--main-font); font-weight: 500;
+                max-width: 300px; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => { notification.style.right = '20px'; }, 100);
+            setTimeout(() => {
+                notification.style.right = '-320px';
+                setTimeout(() => { document.body.removeChild(notification); }, 500);
+            }, 3500);
+        }
+
+        console.log("💖 ขอให้มีความสุขกับการอ่านหนังสือนะ!");
+    </script>
+</body>
+</html>
