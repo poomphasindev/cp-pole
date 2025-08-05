@@ -46,7 +46,7 @@ def classify_image(image, model, class_names):
     data[0] = normalized_image_array
 
     # ทำนายผล
-    prediction = model.predict(data)
+    prediction = model.predict(data, verbose=0)
     index = np.argmax(prediction)
     class_name = class_names[index]
     confidence_score = prediction[0][index]

@@ -17,12 +17,12 @@
 ### 2. Dependencies Check
 
 - [x] Streamlit >= 1.28.0
-- [x] TensorFlow >= 2.12.0, < 2.15.0
-- [x] Keras >= 2.12.0, < 2.15.0
-- [x] NumPy >= 1.23.5, < 1.25.0
-- [x] Pillow >= 9.5.0, < 10.0.0
-- [x] Pandas >= 1.5.0, < 2.1.0
-- [x] OpenPyXL >= 3.0.0, < 4.0.0
+- [x] TensorFlow >= 2.15.0 (updated for Python 3.13 compatibility)
+- [x] Keras >= 2.15.0 (updated for Python 3.13 compatibility)
+- [x] NumPy >= 1.24.0, < 2.0.0 (updated for Python 3.13 compatibility)
+- [x] Pillow >= 10.0.0 (updated for Python 3.13 compatibility)
+- [x] Pandas >= 2.0.0 (updated for Python 3.13 compatibility)
+- [x] OpenPyXL >= 3.1.0 (updated for Python 3.13 compatibility)
 
 ### 3. Code Quality
 
@@ -93,6 +93,12 @@ git push origin main
 
 - **Issue**: Package version conflicts
 - **Solution**: Check `requirements.txt` for compatible versions
+
+#### 3. Python 3.13 Compatibility Issues
+
+- **Issue**: TensorFlow/NumPy compatibility with Python 3.13
+- **Solution**: Updated to TensorFlow >= 2.15.0 and NumPy >= 1.24.0
+- **Alternative**: Use `requirements_alt.txt` if issues persist
 
 #### 3. Memory Issues
 
