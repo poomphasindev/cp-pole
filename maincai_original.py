@@ -1,31 +1,36 @@
 import streamlit as st
+from keras.models import load_model
 from PIL import Image, ImageOps
 import numpy as np
 import pandas as pd
 import os
 from datetime import datetime
 import time
-import random
 
-# --- 1. ฟังก์ชันหลักในการทำงาน (Demo Version) ---
+# --- 1. ฟังก์ชันหลักในการทำงาน ---
 
 @st.cache_resource
-def load_demo_model():
+def load_classification_model(model_path, labels_path):
     """
-    โหลดโมเดล Demo สำหรับการทดสอบ
+    โหลดโมเดล Keras และไฟล์ labels พร้อมการแคชเพื่อประสิทธิภาพ
     """
     try:
-        # สร้าง class names สำหรับ demo
-        class_names = ["P1", "P2", "P3", "P4"]
-        st.success("✅ โหลดโมเดล Demo สำเร็จ!")
-        return class_names
+        model = load_model(model_path)
+        with open(labels_path, 'r', encoding='utf-8') as f:
+            # แยกเอาเฉพาะชื่อคลาสออกมา
+            class_names = [line.strip().split(' ', 1)[1] for line in f if ' ' in line]
+        st.success("✅ โหลดโมเดล AI สำเร็จ!")
+        return model, class_names
+    except FileNotFoundError:
+        st.error(f"🔴 ไม่พบไฟล์โมเดลหรือ labels ที่: {model_path} หรือ {labels_path}")
+        return None, None
     except Exception as e:
         st.error(f"🔴 เกิดข้อผิดพลาดในการโหลดโมเดล: {e}")
-        return None
+        return None, None
 
-def classify_image_demo(image, class_names):
+def classify_image(image, model, class_names):
     """
-    ฟังก์ชัน Demo สำหรับวิเคราะห์ภาพ (จำลองผลลัพธ์)
+    ฟังก์ชันสำหรับวิเคราะห์ภาพและคืนค่าประเภทพร้อมคะแนนความมั่นใจ
     """
     # ปรับขนาดภาพให้เป็น (224, 224)
     image = ImageOps.fit(image, (224, 224), Image.Resampling.LANCZOS)
@@ -33,25 +38,18 @@ def classify_image_demo(image, class_names):
     # แปลงภาพเป็น numpy array
     image_array = np.asarray(image)
 
-    # จำลองการวิเคราะห์ - ใช้ค่าเฉลี่ยของสีเป็นตัวกำหนดผลลัพธ์
-    avg_color = np.mean(image_array)
-    
-    # แบ่งช่วงสีเพื่อจำลองการจำแนกประเภท
-    if avg_color < 64:
-        index = 0  # P1 - สีเข้ม
-    elif avg_color < 128:
-        index = 1  # P2 - สีปานกลาง
-    elif avg_color < 192:
-        index = 2  # P3 - สีอ่อน
-    else:
-        index = 3  # P4 - สีสว่าง
-    
-    # เพิ่มความสุ่มเล็กน้อย
-    if random.random() < 0.1:  # 10% chance to change
-        index = random.randint(0, 3)
-    
+    # ทำให้ค่าสีเป็นปกติ (Normalize)
+    normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
+
+    # เตรียมข้อมูลสำหรับ Model
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    data[0] = normalized_image_array
+
+    # ทำนายผล
+    prediction = model.predict(data, verbose=0)
+    index = np.argmax(prediction)
     class_name = class_names[index]
-    confidence_score = random.uniform(0.7, 0.95)  # จำลองความมั่นใจ
+    confidence_score = prediction[0][index]
 
     return class_name, confidence_score
 
@@ -159,16 +157,6 @@ def apply_custom_css():
     [data-testid="stSuccess"] { border-left: 5px solid var(--seven-green); }
     [data-testid="stError"] { border-left: 5px solid var(--seven-red); }
 
-    /* Demo warning */
-    .demo-warning {
-        background-color: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        color: #856404;
-    }
-
     </style>
     """, unsafe_allow_html=True)
 
@@ -185,20 +173,13 @@ def display_header():
         unsafe_allow_html=True
     )
     st.markdown('<p style="text-align: center;">ระบบตรวจสอบป้ายสัญลักษณ์ 7-ELEVEN ด้วยภาพถ่าย</p>', unsafe_allow_html=True)
-    
-    # แสดงข้อความ Demo
-    st.markdown(
-        '<div class="demo-warning">⚠️ <strong>Demo Version:</strong> ระบบนี้กำลังทำงานในโหมดจำลอง (Demo Mode) เพื่อทดสอบการทำงาน ฟีเจอร์ AI จะถูกเพิ่มในภายหลัง</div>',
-        unsafe_allow_html=True
-    )
-    
     st.markdown("---")
 
 def display_results(results_list):
     """
     แสดงผลลัพธ์การวิเคราะห์ในรูปแบบคอลัมน์
     """
-    st.subheader("🎯 ผลการวิเคราะห์ (Demo)")
+    st.subheader("🎯 ผลการวิเคราะห์")
     
     # กำหนดจำนวนคอลัมน์ไม่เกิน 3 คอลัมน์ต่อแถว
     num_cols = min(len(results_list), 3)
@@ -224,7 +205,7 @@ def display_results(results_list):
 def main():
     # ตั้งค่าหน้าเว็บและ CSS
     st.set_page_config(
-        page_title="7-Connect PM AI (Demo)",
+        page_title="7-Connect PM AI",
         page_icon="🔧",
         layout="wide",
         initial_sidebar_state="collapsed"
@@ -232,9 +213,9 @@ def main():
     apply_custom_css()
     display_header()
 
-    # โหลดโมเดล Demo
-    class_names = load_demo_model()
-    if not class_names:
+    # โหลดโมเดล
+    model, class_names = load_classification_model("model/keras_model.h5", "model/labels.txt")
+    if not model or not class_names:
         st.stop() # หยุดการทำงานถ้าโหลดโมเดลไม่สำเร็จ
     
     # --- ส่วนรับข้อมูล ---
@@ -246,6 +227,7 @@ def main():
         code = st.text_input("รหัสสาขา:", placeholder="เช่น 12345")
     with col2:
         sign_type = st.text_input("ประเภทป้าย:", placeholder="เช่น ป้ายไฟ, ป้ายไวนิล")
+        # many = st.slider("จำนวนภาพที่ต้องการอัปโหลด:", 1, 10, 1) # อาจไม่จำเป็นถ้าให้ user อัปโหลดเอง
 
     st.subheader("2. อัปโหลดรูปภาพ")
     files = st.file_uploader(
@@ -270,8 +252,8 @@ def main():
             try:
                 image = Image.open(file).convert('RGB')
                 
-                # ทำนายผล (Demo)
-                class_name, confidence_score = classify_image_demo(image, class_names)
+                # ทำนายผล
+                class_name, confidence_score = classify_image(image, model, class_names)
                 
                 # เก็บผลลัพธ์ไว้ใน session_state
                 st.session_state['analysis_results'].append({
@@ -321,15 +303,14 @@ def main():
                                 'Image Filename': image_name,
                                 'Phase': result['class_name'],
                                 'Confidence': f"{result['confidence']:.4f}",
-                                'Upload Time': upload_time,
-                                'Demo Mode': 'Yes'
+                                'Upload Time': upload_time
                             })
                         
                         # บันทึกลง Excel
                         success, error_msg = save_to_excel(data_to_save, 'data.xlsx')
                         
                         if success:
-                            st.success("🎉 บันทึกข้อมูลเรียบร้อยแล้ว! (Demo Mode)")
+                            st.success("🎉 บันทึกข้อมูลเรียบร้อยแล้ว!")
                             st.balloons()
                         else:
                             st.error(f"❌ เกิดข้อผิดพลาดในการบันทึกไฟล์: {error_msg}")
@@ -338,4 +319,4 @@ def main():
         st.info("⬆️ กรุณาอัปโหลดรูปภาพเพื่อเริ่มการวิเคราะห์")
 
 if __name__ == "__main__":
-    main() 
+    main()
